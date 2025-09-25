@@ -16,9 +16,9 @@ public class DebugService : IDebugService
     private readonly DateTime _startTime;
 
     public IReadOnlyList<DebugLogEntry> DebugLogs => _logs.AsReadOnly();
-    
+
     public SystemInfo SystemInfo { get; }
-    
+
     public event Action? OnLogAdded;
 
     public DebugService(IWebAssemblyHostEnvironment hostEnvironment, IJSRuntime jsRuntime)
@@ -26,7 +26,7 @@ public class DebugService : IDebugService
         _hostEnvironment = hostEnvironment;
         _jsRuntime = jsRuntime;
         _startTime = DateTime.Now;
-        
+
         SystemInfo = new SystemInfo(
             UserAgent: "Browser", // Sarà aggiornato via JS
             Platform: Environment.OSVersion.Platform.ToString(),
@@ -37,7 +37,7 @@ public class DebugService : IDebugService
 
         // Log di inizializzazione
         AddLog(LogLevel.Information, "🔧 DebugService inizializzato", "System");
-        
+
         // Inizializza informazioni del browser
         _ = InitializeBrowserInfoAsync();
     }
@@ -50,17 +50,17 @@ public class DebugService : IDebugService
             message,
             category
         );
-        
+
         _logs.Add(logEntry);
-        
+
         // Mantieni solo gli ultimi 100 log per evitare memory leak
         if (_logs.Count > 100)
         {
             _logs.RemoveAt(0);
         }
-        
+
         OnLogAdded?.Invoke();
-        
+
         // Log anche nella console del browser
         _ = LogToBrowserConsoleAsync(level, message, category);
     }
@@ -75,7 +75,7 @@ public class DebugService : IDebugService
     {
         var uptime = DateTime.Now - _startTime;
         var memoryUsage = GC.GetTotalMemory(false);
-        
+
         return new PerformanceInfo(
             Uptime: uptime,
             LogCount: _logs.Count,
@@ -89,7 +89,7 @@ public class DebugService : IDebugService
         {
             var userAgent = await _jsRuntime.InvokeAsync<string>("eval", "navigator.userAgent");
             var platform = await _jsRuntime.InvokeAsync<string>("eval", "navigator.platform");
-            
+
             AddLog(LogLevel.Debug, $"🌐 User Agent: {userAgent}", "Browser");
             AddLog(LogLevel.Debug, $"💻 Platform: {platform}", "Browser");
         }
@@ -105,7 +105,7 @@ public class DebugService : IDebugService
         {
             var prefix = category != null ? $"[{category}]" : "[MyBlazorApp]";
             var fullMessage = $"{prefix} {message}";
-            
+
             var consoleMethod = level switch
             {
                 LogLevel.Error or LogLevel.Critical => "error",
@@ -114,7 +114,7 @@ public class DebugService : IDebugService
                 LogLevel.Debug => "debug",
                 _ => "log"
             };
-            
+
             await _jsRuntime.InvokeVoidAsync("console." + consoleMethod, fullMessage);
         }
         catch

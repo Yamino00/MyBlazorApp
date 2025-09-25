@@ -1,4 +1,3 @@
-
 # 💰 MyBlazorApp - Gestione Budget Personale
 
 <div align="center">
@@ -10,13 +9,14 @@
 
 **🌐 [Demo Live](https://yamino00.github.io/MyBlazorApp/) | 👨‍💻 Sviluppato da Federico Vincenzo Leccese**
 
-*Un'applicazione moderna per la gestione del budget personale costruita con Blazor WebAssembly*
+_Un'applicazione moderna per la gestione del budget personale costruita con Blazor WebAssembly_
 
 </div>
 
 ---
 
 ## 📋 Indice
+
 - [🎯 Descrizione del progetto](#-descrizione-del-progetto)
 - [🛠️ Realizzazione tecnica](#️-realizzazione-tecnica)
 - [🏗️ Architettura e funzionalità](#️-architettura-e-funzionalità)
@@ -37,6 +37,7 @@ MyBlazorApp è un'**applicazione web per la gestione del budget personale** che 
 L'applicazione, strutturata come un sistema completo di tracciamento finanziario, rappresenta un **esempio concreto** di come sia possibile creare interfacce utente interattive e funzionali utilizzando esclusivamente **C# e .NET**, senza dover ricorrere a JavaScript per la logica di business.
 
 ### ✨ Caratteristiche principali
+
 - 📊 **Dashboard completa** con panoramica finanziaria
 - 💳 **Gestione spese** con categorizzazione automatica
 - 📈 **Sistema di reporting** avanzato con grafici
@@ -52,28 +53,36 @@ L'applicazione è stata sviluppata utilizzando **Blazor WebAssembly**, che conse
 La struttura del progetto è stata progettata seguendo le **best practices di Blazor** e include i seguenti componenti principali:
 
 ### 🏠 1. Dashboard principale
+
 Fornisce una panoramica completa delle finanze personali con:
+
 - 💰 Cards riepilogative per entrate, spese e bilancio corrente
 - 🎯 Visualizzazione obiettivi di risparmio
 - 📋 Lista delle transazioni più recenti
 - 📊 Grafici distribuzione spese per categoria
 
 ### 💳 2. Gestione spese
+
 Sistema completo per il tracking delle spese con:
+
 - ✍️ Form di inserimento validato
 - 🏷️ Categorizzazione automatica delle transazioni
 - 📱 Interfaccia responsive per input rapido
 - 📈 Calcolo automatico dei totali
 
 ### 📊 3. Sistema di reporting
+
 Analytics avanzata delle finanze con:
+
 - 🔍 Filtri per periodo (mese/trimestre/anno)
 - 🏷️ Filtri per categoria di spesa
 - 📈 Grafici interattivi per la visualizzazione dati
 - 🎯 Tracking degli obiettivi di risparmio con progress bar
 
 ### 📱 4. Layout responsive
+
 Design moderno e funzionale con:
+
 - 🎨 Bootstrap 5 per garantire compatibilità cross-device
 - 🧭 Navigazione intuitiva con menu collapsible
 - 💫 Animazioni e transizioni fluide
@@ -85,12 +94,12 @@ Design moderno e funzionale con:
 
 Il progetto implementa un'**architettura component-based** che garantisce:
 
-| Caratteristica | Descrizione |
-|----------------|-------------|
-| 🔧 **Separazione delle responsabilità** | Componenti specializzati per layout, navigazione e funzionalità specifiche |
-| 🔄 **Gestione dello stato locale** | Binding bidirezionale e reactive programming per interfaccia sempre aggiornata |
-| ✅ **Validazione integrata** | Controlli automatici sui form di input e feedback immediato all'utente |
-| 🎭 **Simulazione dati realistica** | Transazioni di esempio e calcoli automatici per demo delle potenzialità |
+| Caratteristica                          | Descrizione                                                                    |
+| --------------------------------------- | ------------------------------------------------------------------------------ |
+| 🔧 **Separazione delle responsabilità** | Componenti specializzati per layout, navigazione e funzionalità specifiche     |
+| 🔄 **Gestione dello stato locale**      | Binding bidirezionale e reactive programming per interfaccia sempre aggiornata |
+| ✅ **Validazione integrata**            | Controlli automatici sui form di input e feedback immediato all'utente         |
+| 🎭 **Simulazione dati realistica**      | Transazioni di esempio e calcoli automatici per demo delle potenzialità        |
 
 ---
 
@@ -99,21 +108,25 @@ Il progetto implementa un'**architettura component-based** che garantisce:
 Grazie alla tecnologia **Blazor WebAssembly**, questa applicazione dimostra diversi vantaggi significativi:
 
 ### 🎯 Sviluppo Unificato
+
 - 🔄 Utilizzo di **C#** sia per logica client che per future estensioni server-side
 - 📚 Condivisione di modelli e logica tra client e server
 - 🛠️ Tooling unificato per debugging e development
 
 ### 🚀 Performance Ottimizzate
+
 - ⚡ Esecuzione di codice **.NET compilato** direttamente nel browser
 - 🎮 Utilizzo della potenza di **WebAssembly** per calcoli complessi
 - 📱 Esperienza utente fluida senza round-trip al server
 
 ### 🔗 Ecosistema .NET Completo
+
 - 📦 Accesso a tutte le librerie **.NET** esistenti
 - 🛠️ Strumenti di debugging familiari agli sviluppatori .NET
 - 📋 Pattern e architetture consolidate del mondo .NET
 
 ### 🌐 Deployment Semplificato
+
 - 📄 Hosting su qualsiasi **server web statico**
 - 🚫 Nessuna necessità di runtime server-side
 - 🔧 Deploy automatico su **GitHub Pages**
@@ -124,14 +137,14 @@ Grazie alla tecnologia **Blazor WebAssembly**, questa applicazione dimostra dive
 
 <div align="center">
 
-| Tecnologia | Versione | Utilizzo |
-|------------|----------|----------|
-| ![.NET](https://img.shields.io/badge/.NET-5C2D91?style=flat-square&logo=.net&logoColor=white) | **9.0** | Framework di base |
-| ![Blazor](https://img.shields.io/badge/Blazor-512BD4?style=flat-square&logo=blazor&logoColor=white) | **WebAssembly** | Interfaccia utente interattiva |
-| ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=flat-square&logo=bootstrap&logoColor=white) | **5.x** | Design responsive e componenti UI |
-| ![Bootstrap Icons](https://img.shields.io/badge/Bootstrap_Icons-7952B3?style=flat-square&logo=bootstrap&logoColor=white) | **Latest** | Iconografia moderna |
-| ![C#](https://img.shields.io/badge/C%23-239120?style=flat-square&logo=c-sharp&logoColor=white) | **12** | Linguaggio di programmazione |
-| ![Razor](https://img.shields.io/badge/Razor-512BD4?style=flat-square&logo=razor&logoColor=white) | **Components** | Composizione interfaccia utente |
+| Tecnologia                                                                                                               | Versione        | Utilizzo                          |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------- | --------------------------------- |
+| ![.NET](https://img.shields.io/badge/.NET-5C2D91?style=flat-square&logo=.net&logoColor=white)                            | **9.0**         | Framework di base                 |
+| ![Blazor](https://img.shields.io/badge/Blazor-512BD4?style=flat-square&logo=blazor&logoColor=white)                      | **WebAssembly** | Interfaccia utente interattiva    |
+| ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=flat-square&logo=bootstrap&logoColor=white)             | **5.x**         | Design responsive e componenti UI |
+| ![Bootstrap Icons](https://img.shields.io/badge/Bootstrap_Icons-7952B3?style=flat-square&logo=bootstrap&logoColor=white) | **Latest**      | Iconografia moderna               |
+| ![C#](https://img.shields.io/badge/C%23-239120?style=flat-square&logo=c-sharp&logoColor=white)                           | **12**          | Linguaggio di programmazione      |
+| ![Razor](https://img.shields.io/badge/Razor-512BD4?style=flat-square&logo=razor&logoColor=white)                         | **Components**  | Composizione interfaccia utente   |
 
 </div>
 
@@ -142,12 +155,15 @@ Grazie alla tecnologia **Blazor WebAssembly**, questa applicazione dimostra dive
 > **Nota**: Le screenshots mostrano l'interfaccia dell'applicazione nelle sue diverse sezioni.
 
 ### 🏠 Dashboard
+
 La dashboard principale mostra una panoramica completa delle finanze personali con cards informative e grafici.
 
 ### 💳 Gestione Spese
+
 Interfaccia intuitiva per l'inserimento e la gestione delle spese quotidiane.
 
 ### 📊 Reports
+
 Sistema di reporting avanzato con filtri e visualizzazioni grafiche dei dati finanziari.
 
 ---
@@ -155,6 +171,7 @@ Sistema di reporting avanzato con filtri e visualizzazioni grafiche dei dati fin
 ## 🛠️ Installazione e utilizzo
 
 ### Prerequisiti
+
 - ![.NET](https://img.shields.io/badge/.NET-5C2D91?style=flat-square&logo=.net&logoColor=white) **.NET 9.0 SDK** o superiore
 - 🌐 Browser moderno con supporto **WebAssembly**
 
@@ -174,6 +191,7 @@ dotnet run
 L'applicazione sarà disponibile su `https://localhost:7274` (HTTPS) o `http://localhost:5097` (HTTP).
 
 ### 🌐 Demo online
+
 Puoi testare l'applicazione direttamente online: **[MyBlazorApp Demo](https://yamino00.github.io/MyBlazorApp/)**
 
 ---
@@ -217,11 +235,12 @@ Possibili miglioramenti e funzionalità da implementare:
 - [ ] 📋 **Budget planning** avanzato
 - [ ] 🎨 **Temi personalizzabili**
 
-## 🔧 Debug Features *(NEW!)*
+## 🔧 Debug Features _(NEW!)_
 
 Il progetto include ora un **sistema di debug avanzato** per migliorare l'esperienza di sviluppo:
 
 ### ✨ Funzionalità Debug Implementate
+
 - 🖥️ **Debug Console** retrattile con interface multi-tab
 - 📊 **Monitoraggio performance** in tempo reale
 - 🔍 **Sistema di logging** centralizzato con categorizzazione
@@ -229,6 +248,7 @@ Il progetto include ora un **sistema di debug avanzato** per migliorare l'esperi
 - ⚙️ **Configurazioni VS Code** ottimizzate per Blazor debugging
 
 ### 🚀 Come Accedere
+
 1. **Debug Console**: Clicca il pulsante 🔧 in basso a destra (solo in Development)
 2. **Test Page**: Naviga su `/debug-test` dal menu (solo in Development)
 3. **VS Code Debug**: Usa le configurazioni in `.vscode/launch.json`
@@ -241,7 +261,7 @@ Il progetto include ora un **sistema di debug avanzato** per migliorare l'esperi
 
 **💡 Progetto realizzato per scopi didattici e dimostrativi**
 
-*Mostra le potenzialità di Blazor WebAssembly nello sviluppo di applicazioni web moderne*
+_Mostra le potenzialità di Blazor WebAssembly nello sviluppo di applicazioni web moderne_
 
 ---
 
@@ -257,5 +277,3 @@ Questo progetto rappresenta un **esempio pratico e completo** di come implementa
 **⭐ Se ti è piaciuto il progetto, lascia una stella!**
 
 </div>
-
-

@@ -11,17 +11,17 @@ public interface IDebugService
     /// Lista dei log di debug
     /// </summary>
     IReadOnlyList<DebugLogEntry> DebugLogs { get; }
-    
+
     /// <summary>
     /// Informazioni di sistema
     /// </summary>
     SystemInfo SystemInfo { get; }
-    
+
     /// <summary>
     /// Evento scatenato quando viene aggiunto un nuovo log
     /// </summary>
     event Action? OnLogAdded;
-    
+
     /// <summary>
     /// Aggiunge un log di debug
     /// </summary>
@@ -29,12 +29,12 @@ public interface IDebugService
     /// <param name="message">Messaggio</param>
     /// <param name="category">Categoria opzionale</param>
     void AddLog(LogLevel level, string message, string? category = null);
-    
+
     /// <summary>
     /// Pulisce tutti i log
     /// </summary>
     void ClearLogs();
-    
+
     /// <summary>
     /// Ottiene le performance dell'applicazione
     /// </summary>
