@@ -1,0 +1,241 @@
+﻿@page "/reports"
+@inject HttpClient Http
+
+<PageTitle>Reports - Gestione Budget</PageTitle>
+
+<h1>📊 Reports Finanziari</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Filtri</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Periodo</label>
+                        <select @bind="selectedPeriod" class="form-select">
+                            <option value="month">Questo mese</option>
+                            <option value="quarter">Ultimo trimestre</option>
+                            <option value="year">Quest'anno</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Categoria</label>
+                        <select @bind="selectedCategory" class="form-select">
+                            <option value="">Tutte</option>
+                            <option value="Alimentari">Alimentari</option>
+                            <option value="Trasporti">Trasporti</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Svago">Svago</option>
+                            <option value="Casa">Casa</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5>Risparmio Obiettivo</h5>
+                <div class="progress mb-2" style="height: 30px;">
+                    <div class="progress-bar @GetSavingsProgressColor()" 
+                         style="width: @GetSavingsPercentage()%">
+                        @GetSavingsPercentage().ToString("F1")%
+                    </div>
+                </div>
+                <p>€@currentSavings.ToString("N2") / €@savingsGoal.ToString("N2")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (monthlyData == null)
+{
+    <p><em>Caricamento dati...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Spese per Categoria</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var category in GetFilteredExpensesByCategory())
+                    {
+                        var percentage = (category.Value / GetTotalFilteredExpenses()) * 100;
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>@category.Key</span>
+                                <span class="fw-bold">€@category.Value.ToString("N2")</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: @percentage.ToString("F1")%"></div>
+                            </div>
+                            <small class="text-muted">@percentage.ToString("F1")% del totale</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Trend Mensile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Mese</th>
+                                    <th>Entrate</th>
+                                    <th>Spese</th>
+                                    <th>Bilancio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var month in monthlyData)
+                                {
+                                    var balance = month.Income - month.Expenses;
+                                    <tr>
+                                        <td>@month.Month</td>
+                                        <td class="text-success">€@month.Income.ToString("N2")</td>
+                                        <td class="text-danger">€@month.Expenses.ToString("N2")</td>
+                                        <td class="@(balance >= 0 ? "text-success" : "text-danger")">
+                                            €@balance.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Statistiche Dettagliate</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h4 class="text-primary">€@GetAverageMonthlyExpenses().ToString("N2")</h4>
+                                <p class="mb-0">Spesa Media Mensile</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h4 class="text-success">€@GetHighestExpenseCategory().Value.ToString("N2")</h4>
+                                <p class="mb-0">Categoria Top: @GetHighestExpenseCategory().Key</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h4 class="text-warning">@GetTotalTransactions()</h4>
+                                <p class="mb-0">Transazioni Totali</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h4 class="text-info">€@(monthlyData.Sum(m => m.Income) - monthlyData.Sum(m => m.Expenses)).ToString("N2")</h4>
+                                <p class="mb-0">Risparmio Totale</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private MonthlyReport[]? monthlyData;
+    private string selectedPeriod = "month";
+    private string selectedCategory = "";
+    private decimal currentSavings = 649.25m;
+    private decimal savingsGoal = 1000.00m;
+
+    private Dictionary<string, decimal> expensesByCategory = new()
+    {
+        { "Alimentari", 450.00m },
+        { "Trasporti", 320.50m },
+        { "Utilities", 280.25m },
+        { "Svago", 200.00m },
+        { "Casa", 600.00m },
+        { "Salute", 150.00m }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simula il caricamento dei dati
+        await Task.Delay(500);
+        
+        monthlyData = new MonthlyReport[]
+        {
+            new() { Month = "Gennaio 2025", Income = 2500.00m, Expenses = 1850.75m },
+            new() { Month = "Febbraio 2025", Income = 2500.00m, Expenses = 1923.50m },
+            new() { Month = "Marzo 2025", Income = 2650.00m, Expenses = 1756.25m },
+            new() { Month = "Aprile 2025", Income = 2500.00m, Expenses = 1995.80m },
+            new() { Month = "Maggio 2025", Income = 2500.00m, Expenses = 1823.45m },
+            new() { Month = "Giugno 2025", Income = 2700.00m, Expenses = 2105.30m }
+        };
+    }
+
+    private Dictionary<string, decimal> GetFilteredExpensesByCategory()
+    {
+        if (string.IsNullOrEmpty(selectedCategory))
+            return expensesByCategory;
+        
+        return expensesByCategory.Where(kvp => kvp.Key == selectedCategory).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+    private decimal GetTotalFilteredExpenses()
+    {
+        return GetFilteredExpensesByCategory().Values.Sum();
+    }
+
+    private decimal GetAverageMonthlyExpenses()
+    {
+        return monthlyData?.Average(m => m.Expenses) ?? 0;
+    }
+
+    private KeyValuePair<string, decimal> GetHighestExpenseCategory()
+    {
+        return expensesByCategory.OrderByDescending(kvp => kvp.Value).First();
+    }
+
+    private int GetTotalTransactions()
+    {
+        return monthlyData?.Length * 15 ?? 0; // Simula circa 15 transazioni per mese
+    }
+
+    private double GetSavingsPercentage()
+    {
+        return Math.Min(100, (double)(currentSavings / savingsGoal * 100));
+    }
+
+    private string GetSavingsProgressColor()
+    {
+        var percentage = GetSavingsPercentage();
+        return percentage >= 80 ? "bg-success" : percentage >= 50 ? "bg-warning" : "bg-danger";
+    }
+
+    public class MonthlyReport
+    {
+        public string Month { get; set; } = "";
+        public decimal Income { get; set; }
+        public decimal Expenses { get; set; }
+    }
+}

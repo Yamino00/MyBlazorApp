@@ -1,0 +1,87 @@
+﻿<nav class="navbar navbar-expand-lg navbar-dark bg-gradient">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="">
+            <span class="brand-icon me-2">💰</span>
+            <span class="brand-text">Gestione Budget</span>
+        </a>
+
+        <!-- Mobile toggle button -->
+        <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu" aria-expanded="@(!collapseNavMenu)">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation items -->
+        <div class="@NavMenuCssClass navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <i class="bi bi-speedometer2 me-1"></i>
+                        Dashboard
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="expenses">
+                        <i class="bi bi-credit-card me-1"></i>
+                        Spese
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="reports">
+                        <i class="bi bi-bar-chart me-1"></i>
+                        Reports
+                    </NavLink>
+                </li>
+            </ul>
+
+            <!-- Right side items -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" @onclick="ToggleUserMenu" 
+                       aria-expanded="@(!collapseUserMenu)">
+                        <i class="bi bi-person-circle me-1"></i>
+                        Utente
+                    </a>
+                    <ul class="@UserMenuCssClass dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Impostazioni</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-download me-2"></i>Esporta Dati</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="https://github.com/Yamino00/MyBlazorApp" target="_blank">
+                            <i class="bi bi-github me-2"></i>GitHub</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <span class="navbar-text">
+                        <span class="badge bg-success">€@currentBalance.ToString("N0")</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool collapseUserMenu = true;
+    private decimal currentBalance = 649.25m;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : "";
+    private string? UserMenuCssClass => collapseUserMenu ? "dropdown-menu" : "dropdown-menu show";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+        collapseUserMenu = true; // Close user menu when toggling main menu
+    }
+
+    private void ToggleUserMenu()
+    {
+        collapseUserMenu = !collapseUserMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        // Simula il calcolo del bilancio corrente
+        currentBalance = 2500.00m - 1850.75m; // Entrate - Spese
+    }
+}

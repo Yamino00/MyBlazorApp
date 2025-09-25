@@ -1,0 +1,134 @@
+﻿@page "/"
+
+<PageTitle>Dashboard - Gestione Budget</PageTitle>
+
+<h1>💰 Dashboard Finanziaria</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Entrate Mese</h5>
+                <h3>€@totalIncome.ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Spese Mese</h5>
+                <h3>€@totalExpenses.ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Bilancio</h5>
+                <h3>€@((totalIncome - totalExpenses).ToString("N2"))</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Risparmi Target</h5>
+                <h3>€@savingsTarget.ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ultime Transazioni</h5>
+            </div>
+            <div class="card-body">
+                @if (recentTransactions.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var transaction in recentTransactions.Take(5))
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@transaction.Description</strong>
+                                    <small class="text-muted d-block">@transaction.Category</small>
+                                </div>
+                                <span class="badge @(transaction.Amount > 0 ? "bg-success" : "bg-danger")">
+                                    €@transaction.Amount.ToString("N2")
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Nessuna transazione registrata</p>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Spese per Categoria</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var category in expensesByCategory)
+                {
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>@category.Key</span>
+                            <span>€@category.Value.ToString("N2")</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @(category.Value / totalExpenses * 100)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal totalIncome = 2500.00m;
+    private decimal totalExpenses = 1850.75m;
+    private decimal savingsTarget = 500.00m;
+    
+    private List<Transaction> recentTransactions = new();
+    private Dictionary<string, decimal> expensesByCategory = new();
+
+    public class Transaction
+    {
+        public string Description { get; set; } = "";
+        public string Category { get; set; } = "";
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Dati di esempio
+        recentTransactions = new List<Transaction>
+        {
+            new() { Description = "Stipendio", Category = "Lavoro", Amount = 2500.00m, Date = DateTime.Now.AddDays(-1) },
+            new() { Description = "Spesa supermercato", Category = "Alimentari", Amount = -85.50m, Date = DateTime.Now.AddDays(-2) },
+            new() { Description = "Benzina", Category = "Trasporti", Amount = -65.00m, Date = DateTime.Now.AddDays(-3) },
+            new() { Description = "Cena fuori", Category = "Svago", Amount = -45.00m, Date = DateTime.Now.AddDays(-4) },
+            new() { Description = "Bolletta luce", Category = "Utilities", Amount = -120.25m, Date = DateTime.Now.AddDays(-5) }
+        };
+
+        expensesByCategory = new Dictionary<string, decimal>
+        {
+            { "Alimentari", 450.00m },
+            { "Trasporti", 320.50m },
+            { "Utilities", 280.25m },
+            { "Svago", 200.00m },
+            { "Casa", 600.00m }
+        };
+    }
+}

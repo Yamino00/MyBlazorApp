@@ -1,0 +1,183 @@
+﻿@page "/expenses"
+
+<PageTitle>Gestione Spese - Gestione Budget</PageTitle>
+
+<h1>💳 Gestione Spese</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Aggiungi Nuova Spesa</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Descrizione</label>
+                    <input @bind="newExpense.Description" class="form-control" placeholder="es. Spesa supermercato" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Categoria</label>
+                    <select @bind="newExpense.Category" class="form-select">
+                        <option value="">Seleziona categoria</option>
+                        <option value="Alimentari">Alimentari</option>
+                        <option value="Trasporti">Trasporti</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Svago">Svago</option>
+                        <option value="Casa">Casa</option>
+                        <option value="Salute">Salute</option>
+                        <option value="Abbigliamento">Abbigliamento</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Importo (€)</label>
+                    <input @bind="newExpense.Amount" type="number" step="0.01" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Data</label>
+                    <input @bind="newExpense.Date" type="date" class="form-control" />
+                </div>
+                <button @onclick="AddExpense" class="btn btn-primary w-100" disabled="@(!IsValidExpense())">
+                    Aggiungi Spesa
+                </button>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                <h5>Totale Spese</h5>
+                <h2 class="text-danger">€@expenses.Sum(e => e.Amount).ToString("N2")</h2>
+                <p class="text-muted">@expenses.Count spese registrate</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Lista Spese</h5>
+                <div>
+                    <select @bind="selectedCategory" class="form-select form-select-sm" style="width: auto;">
+                        <option value="">Tutte le categorie</option>
+                        <option value="Alimentari">Alimentari</option>
+                        <option value="Trasporti">Trasporti</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Svago">Svago</option>
+                        <option value="Casa">Casa</option>
+                        <option value="Salute">Salute</option>
+                        <option value="Abbigliamento">Abbigliamento</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (FilteredExpenses.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrizione</th>
+                                    <th>Categoria</th>
+                                    <th>Importo</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var expense in FilteredExpenses.OrderByDescending(e => e.Date))
+                                {
+                                    <tr>
+                                        <td>@expense.Date.ToString("dd/MM/yyyy")</td>
+                                        <td>@expense.Description</td>
+                                        <td>
+                                            <span class="badge bg-secondary">@expense.Category</span>
+                                        </td>
+                                        <td class="text-danger">€@expense.Amount.ToString("N2")</td>
+                                        <td>
+                                            <button @onclick="() => RemoveExpense(expense)" class="btn btn-sm btn-outline-danger">
+                                                Elimina
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">
+                        @if (string.IsNullOrEmpty(selectedCategory))
+                        {
+                            <span>Nessuna spesa registrata. Aggiungi la tua prima spesa!</span>
+                        }
+                        else
+                        {
+                            <span>Nessuna spesa trovata per la categoria "@selectedCategory"</span>
+                        }
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Expense> expenses = new();
+    private Expense newExpense = new();
+    private string selectedCategory = "";
+
+    public class Expense
+    {
+        public string Description { get; set; } = "";
+        public string Category { get; set; } = "";
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; } = DateTime.Today;
+    }
+
+    private IEnumerable<Expense> FilteredExpenses =>
+        string.IsNullOrEmpty(selectedCategory) 
+            ? expenses 
+            : expenses.Where(e => e.Category == selectedCategory);
+
+    protected override void OnInitialized()
+    {
+        // Dati di esempio
+        expenses = new List<Expense>
+        {
+            new() { Description = "Spesa supermercato", Category = "Alimentari", Amount = 85.50m, Date = DateTime.Today.AddDays(-1) },
+            new() { Description = "Benzina", Category = "Trasporti", Amount = 65.00m, Date = DateTime.Today.AddDays(-2) },
+            new() { Description = "Bolletta luce", Category = "Utilities", Amount = 120.25m, Date = DateTime.Today.AddDays(-3) },
+            new() { Description = "Cena fuori", Category = "Svago", Amount = 45.00m, Date = DateTime.Today.AddDays(-4) },
+            new() { Description = "Affitto", Category = "Casa", Amount = 600.00m, Date = DateTime.Today.AddDays(-5) }
+        };
+    }
+
+    private bool IsValidExpense()
+    {
+        return !string.IsNullOrWhiteSpace(newExpense.Description) &&
+               !string.IsNullOrWhiteSpace(newExpense.Category) &&
+               newExpense.Amount > 0;
+    }
+
+    private void AddExpense()
+    {
+        if (IsValidExpense())
+        {
+            expenses.Add(new Expense
+            {
+                Description = newExpense.Description,
+                Category = newExpense.Category,
+                Amount = newExpense.Amount,
+                Date = newExpense.Date
+            });
+
+            // Reset form
+            newExpense = new Expense { Date = DateTime.Today };
+        }
+    }
+
+    private void RemoveExpense(Expense expense)
+    {
+        expenses.Remove(expense);
+    }
+}
