@@ -119,8 +119,8 @@
 <!-- Toggle button when console is hidden -->
 @if (!_isVisible)
 {
-    <button class="debug-toggle-btn" @onclick="ToggleConsole" title="Apri Debug Console">
-        <i class="bi bi-bug-fill"></i>
+    <button class="debug-toggle-btn" @onclick="ToggleConsole" title="🔧 Apri Debug Console - Sviluppatori">
+        <i class="bi bi-wrench-adjustable-circle-fill"></i>
         @if (DebugService.DebugLogs.Count > 0)
         {
             <span class="debug-badge">@DebugService.DebugLogs.Count</span>

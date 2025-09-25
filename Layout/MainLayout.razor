@@ -13,6 +13,10 @@
 </div>
 
 @* Debug Console - visibile solo in ambiente di sviluppo *@
-#if DEBUG
+@{
+    #if DEBUG
+}
 <DebugConsole />
-#endif
+@{
+    #endif
+}

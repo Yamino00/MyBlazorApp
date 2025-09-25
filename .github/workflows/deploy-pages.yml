@@ -4,7 +4,7 @@ name: Deploy Blazor App to GitHub Pages
 # In questo caso, si attiva ad ogni push sul branch 'main'.
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 # Concede i permessi necessari al workflow per scrivere su GitHub Pages.
 permissions:
@@ -25,17 +25,37 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       # Step 3: Compila l'applicazione in modalità Release e la pubblica
       # nella directory 'publish'. L'output è ottimizzato per la produzione.
       - name: Publish .NET app
         run: dotnet publish MyBlazorApp.csproj -c Release -o publish
 
+      # Step 3.5: Verifica che i file CSS essenziali siano presenti
+      - name: Verify CSS files
+        run: |
+          echo "Verifying CSS files are present..."
+          ls -la publish/wwwroot/css/
+          echo "Bootstrap files:"
+          ls -la publish/wwwroot/lib/bootstrap/dist/css/ || echo "Bootstrap not found"
+          echo "Main CSS file:"
+          test -f publish/wwwroot/css/app.css && echo "✅ app.css found" || echo "❌ app.css missing"
+          echo "Scoped CSS files:"
+          ls -la publish/wwwroot/*.styles.css || echo "No scoped CSS files found"
+
       # Step 4: Workaround per il routing client-side di Blazor su GitHub Pages.
       # Copia 'index.html' in '404.html' per gestire correttamente i refresh delle pagine.
       - name: Add 404.html for client-side routing
         run: cp publish/wwwroot/index.html publish/wwwroot/404.html
+
+      # Step 4.5: Verifica la configurazione del base href
+      - name: Verify base href configuration
+        run: |
+          echo "Checking base href in index.html:"
+          grep -n "base href" publish/wwwroot/index.html || echo "No base href found"
+          echo "Checking first few lines of index.html:"
+          head -15 publish/wwwroot/index.html
 
       # Step 5: Carica l'output della build (la cartella wwwroot) come artefatto.
       # Questo artefatto sarà utilizzato dal job di deploy.
@@ -54,4 +74,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

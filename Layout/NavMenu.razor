@@ -34,14 +34,18 @@
                 </li>
                 
                 @* Link Debug - visibile solo in sviluppo *@
-                #if DEBUG
+                @{
+                    #if DEBUG
+                }
                 <li class="nav-item">
                     <NavLink class="nav-link" href="debug-test">
                         <i class="bi bi-bug me-1"></i>
                         Debug
                     </NavLink>
                 </li>
-                #endif
+                @{
+                    #endif
+                }
             </ul>
 
             <!-- Right side items -->

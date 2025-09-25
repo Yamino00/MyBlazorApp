@@ -34,7 +34,7 @@ packages/
 .nuget/
 
 # Build Blazor
-wwwroot/css/app.css
+# wwwroot/css/app.css - Rimosso: necessario per GitHub Pages
 wwwroot/css/app.css.map
 wwwroot/*.gz
 wwwroot/*.br
