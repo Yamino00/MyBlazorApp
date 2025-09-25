@@ -1,0 +1,272 @@
+@page "/debug-test"
+@inject IDebugService DebugService
+@using Microsoft.Extensions.Logging
+
+<PageTitle>Test Debug - MyBlazorApp</PageTitle>
+
+<h1>🔧 Test Funzionalità Debug</h1>
+<p class="lead">Questa pagina permette di testare tutte le funzionalità di debug implementate.</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>🧪 Generatore Log Test</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Messaggio:</label>
+                    <input @bind="testMessage" type="text" class="form-control" placeholder="Inserisci un messaggio di test" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Categoria:</label>
+                    <input @bind="testCategory" type="text" class="form-control" placeholder="Test" />
+                </div>
+                <div class="btn-group d-flex flex-wrap gap-1" role="group">
+                    <button @onclick="() => AddTestLog(LogLevel.Debug)" class="btn btn-secondary btn-sm">🔍 Debug</button>
+                    <button @onclick="() => AddTestLog(LogLevel.Information)" class="btn btn-info btn-sm">ℹ️ Info</button>
+                    <button @onclick="() => AddTestLog(LogLevel.Warning)" class="btn btn-warning btn-sm">⚠️ Warning</button>
+                    <button @onclick="() => AddTestLog(LogLevel.Error)" class="btn btn-danger btn-sm">❌ Error</button>
+                    <button @onclick="() => AddTestLog(LogLevel.Critical)" class="btn btn-dark btn-sm">💥 Critical</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>📊 Informazioni Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <strong>Environment:</strong> 
+                        <span class="badge bg-primary">@DebugService.SystemInfo.Environment</span>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <strong>Platform:</strong> 
+                        <code>@DebugService.SystemInfo.Platform</code>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <strong>Base Address:</strong> 
+                        <small><code>@DebugService.SystemInfo.BaseAddress</code></small>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <strong>Start Time:</strong> 
+                        <small>@DebugService.SystemInfo.StartTime.ToString("dd/MM/yyyy HH:mm:ss")</small>
+                    </div>
+                </div>
+                <button @onclick="RefreshSystemInfo" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Aggiorna
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>⚡ Performance Monitor</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="performance-metric">
+                    <div class="metric-label">💾 Memoria</div>
+                    <div class="metric-value">@FormatBytes(performanceInfo.MemoryUsage)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>📋 Statistiche Log</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="performance-metric">
+                    <div class="metric-label">📊 Totale Log</div>
+                    <div class="metric-value">@performanceInfo.LogCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>⏰ Uptime</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="performance-metric">
+                    <div class="metric-label">🕒 Tempo attivo</div>
+                    <div class="metric-value">@FormatUptime(performanceInfo.Uptime)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>🎮 Azioni Debug</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <button @onclick="GenerateRandomLogs" class="btn btn-success">
+                        🎲 Genera Log Casuali
+                    </button>
+                    <button @onclick="SimulateError" class="btn btn-danger">
+                        💥 Simula Errore
+                    </button>
+                    <button @onclick="SimulatePerformanceTest" class="btn btn-warning">
+                        📈 Test Performance
+                    </button>
+                    <button @onclick="() => DebugService.ClearLogs()" class="btn btn-outline-secondary">
+                        🧹 Pulisci Log
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .performance-metric {
+        margin-bottom: 10px;
+    }
+    
+    .metric-label {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .metric-value {
+        font-size: 1.4em;
+        font-weight: bold;
+        color: #007bff;
+        font-family: monospace;
+    }
+</style>
+
+@code {
+    private string testMessage = "Messaggio di test";
+    private string testCategory = "Test";
+    private PerformanceInfo performanceInfo = new(TimeSpan.Zero, 0, 0);
+    private Timer? performanceTimer;
+
+    protected override void OnInitialized()
+    {
+        DebugService.AddLog(LogLevel.Information, "🧪 Pagina Test Debug caricata", "TestPage");
+        
+        // Aggiorna le performance ogni 2 secondi
+        performanceTimer = new Timer(_ => 
+        {
+            InvokeAsync(() => 
+            {
+                performanceInfo = DebugService.GetPerformanceInfo();
+                StateHasChanged();
+            });
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
+    }
+
+    private void AddTestLog(LogLevel level)
+    {
+        if (string.IsNullOrWhiteSpace(testMessage))
+            testMessage = "Messaggio di test";
+            
+        DebugService.AddLog(level, testMessage, testCategory);
+    }
+
+    private void RefreshSystemInfo()
+    {
+        performanceInfo = DebugService.GetPerformanceInfo();
+        DebugService.AddLog(LogLevel.Debug, "🔄 Informazioni sistema aggiornate", "TestPage");
+    }
+
+    private void GenerateRandomLogs()
+    {
+        var random = new Random();
+        var messages = new[]
+        {
+            "Operazione completata con successo",
+            "Caricamento dati in corso...",
+            "Connessione stabilita",
+            "Cache aggiornata",
+            "Elaborazione terminata"
+        };
+        
+        var categories = new[] { "System", "Database", "Cache", "Network", "UI" };
+        var levels = new[] { LogLevel.Debug, LogLevel.Information, LogLevel.Warning };
+
+        for (int i = 0; i < 5; i++)
+        {
+            var level = levels[random.Next(levels.Length)];
+            var message = messages[random.Next(messages.Length)];
+            var category = categories[random.Next(categories.Length)];
+            
+            DebugService.AddLog(level, $"{message} (#{random.Next(1000, 9999)})", category);
+        }
+        
+        DebugService.AddLog(LogLevel.Information, "🎲 Generati 5 log casuali", "TestPage");
+    }
+
+    private void SimulateError()
+    {
+        DebugService.AddLog(LogLevel.Error, "💥 Errore simulato: Connessione al database fallita", "Database");
+        DebugService.AddLog(LogLevel.Critical, "🚨 Errore critico: Sistema non disponibile", "System");
+        DebugService.AddLog(LogLevel.Information, "🔄 Tentativo di recupero in corso...", "Recovery");
+    }
+
+    private async Task SimulatePerformanceTest()
+    {
+        DebugService.AddLog(LogLevel.Information, "📈 Inizio test performance", "Performance");
+        
+        // Simula un'operazione pesante
+        for (int i = 1; i <= 5; i++)
+        {
+            await Task.Delay(500); // Simula elaborazione
+            DebugService.AddLog(LogLevel.Debug, $"⏳ Step {i}/5 completato", "Performance");
+        }
+        
+        DebugService.AddLog(LogLevel.Information, "✅ Test performance completato", "Performance");
+    }
+
+    private string FormatBytes(long bytes)
+    {
+        if (bytes == 0) return "0 B";
+        
+        string[] suffixes = { "B", "KB", "MB", "GB" };
+        int counter = 0;
+        decimal number = bytes;
+        
+        while (Math.Round(number / 1024) >= 1 && counter < suffixes.Length - 1)
+        {
+            number /= 1024;
+            counter++;
+        }
+        
+        return $"{number:n1} {suffixes[counter]}";
+    }
+
+    private string FormatUptime(TimeSpan uptime)
+    {
+        if (uptime.TotalDays >= 1)
+            return $"{(int)uptime.TotalDays}d {uptime.Hours}h";
+        else if (uptime.TotalHours >= 1)
+            return $"{uptime.Hours}h {uptime.Minutes}m";
+        else
+            return $"{uptime.Minutes}m {uptime.Seconds}s";
+    }
+
+    public void Dispose()
+    {
+        performanceTimer?.Dispose();
+    }
+}

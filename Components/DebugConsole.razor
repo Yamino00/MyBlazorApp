@@ -1,0 +1,262 @@
+@using MyBlazorApp.Services
+@using Microsoft.Extensions.Logging
+@implements IDisposable
+@inject IDebugService DebugService
+
+<div class="debug-console @(_isVisible ? "visible" : "hidden")">
+    <div class="debug-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="bi bi-bug-fill text-warning me-2"></i>
+                Debug Console
+                <span class="badge bg-secondary ms-2">@DebugService.DebugLogs.Count</span>
+            </h6>
+            <div class="debug-controls">
+                <button class="btn btn-outline-light btn-sm me-1" @onclick="ClearLogs" title="Pulisci log">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-outline-light btn-sm me-1" @onclick="ToggleAutoScroll" title="Auto scroll">
+                    <i class="bi bi-arrow-down-circle @(_autoScroll ? "text-success" : "")"></i>
+                </button>
+                <button class="btn btn-outline-light btn-sm" @onclick="ToggleConsole" title="Nascondi console">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-tabs">
+        <button class="btn btn-sm @(_activeTab == "logs" ? "btn-primary" : "btn-outline-primary")" 
+                @onclick="@(() => SetActiveTab("logs"))">
+            📋 Log
+        </button>
+        <button class="btn btn-sm @(_activeTab == "system" ? "btn-primary" : "btn-outline-primary")" 
+                @onclick="@(() => SetActiveTab("system"))">
+            🖥️ Sistema
+        </button>
+        <button class="btn btn-sm @(_activeTab == "performance" ? "btn-primary" : "btn-outline-primary")" 
+                @onclick="@(() => SetActiveTab("performance"))">
+            ⚡ Performance
+        </button>
+    </div>
+
+    <div class="debug-content">
+        @if (_activeTab == "logs")
+        {
+            <div class="logs-container" @ref="logsContainer">
+                @if (!DebugService.DebugLogs.Any())
+                {
+                    <div class="text-muted text-center p-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Nessun log disponibile
+                    </div>
+                }
+                else
+                {
+                    @foreach (var log in DebugService.DebugLogs.Reverse())
+                    {
+                        <div class="log-entry log-@log.Level.ToString().ToLower()">
+                            <div class="log-time">@log.Timestamp.ToString("HH:mm:ss.fff")</div>
+                            <div class="log-level">@GetLogLevelIcon(log.Level)</div>
+                            <div class="log-category">@(log.Category ?? "General")</div>
+                            <div class="log-message">@log.Message</div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else if (_activeTab == "system")
+        {
+            <div class="system-info">
+                <div class="info-row">
+                    <strong>🌐 Environment:</strong> 
+                    <span class="badge bg-@(_systemInfo.Environment == "Development" ? "warning" : "success")">
+                        @_systemInfo.Environment
+                    </span>
+                </div>
+                <div class="info-row">
+                    <strong>🔗 Base Address:</strong> 
+                    <code>@_systemInfo.BaseAddress</code>
+                </div>
+                <div class="info-row">
+                    <strong>💻 Platform:</strong> 
+                    <code>@_systemInfo.Platform</code>
+                </div>
+                <div class="info-row">
+                    <strong>⏰ Avvio:</strong> 
+                    <code>@_systemInfo.StartTime.ToString("dd/MM/yyyy HH:mm:ss")</code>
+                </div>
+                <div class="info-row">
+                    <strong>🕒 Uptime:</strong> 
+                    <code>@FormatTimeSpan(_performanceInfo.Uptime)</code>
+                </div>
+            </div>
+        }
+        else if (_activeTab == "performance")
+        {
+            <div class="performance-info">
+                <div class="performance-card">
+                    <div class="performance-label">💾 Memoria utilizzata</div>
+                    <div class="performance-value">@FormatBytes(_performanceInfo.MemoryUsage)</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-label">📊 Totale log</div>
+                    <div class="performance-value">@_performanceInfo.LogCount</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-label">⏱️ Uptime</div>
+                    <div class="performance-value">@FormatTimeSpan(_performanceInfo.Uptime)</div>
+                </div>
+                <button class="btn btn-outline-primary btn-sm mt-2" @onclick="RefreshPerformance">
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Aggiorna
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Toggle button when console is hidden -->
+@if (!_isVisible)
+{
+    <button class="debug-toggle-btn" @onclick="ToggleConsole" title="Apri Debug Console">
+        <i class="bi bi-bug-fill"></i>
+        @if (DebugService.DebugLogs.Count > 0)
+        {
+            <span class="debug-badge">@DebugService.DebugLogs.Count</span>
+        }
+    </button>
+}
+
+@code {
+    private bool _isVisible = false;
+    private bool _autoScroll = true;
+    private string _activeTab = "logs";
+    private ElementReference logsContainer;
+    private SystemInfo _systemInfo = null!;
+    private PerformanceInfo _performanceInfo = null!;
+    private Timer? _performanceTimer;
+
+    protected override void OnInitialized()
+    {
+        _systemInfo = DebugService.SystemInfo;
+        _performanceInfo = DebugService.GetPerformanceInfo();
+        DebugService.OnLogAdded += OnLogAdded;
+        
+        // Timer per aggiornare le performance ogni 5 secondi
+        _performanceTimer = new Timer(UpdatePerformance, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+        
+        // Log di inizializzazione componente
+        DebugService.AddLog(LogLevel.Debug, "🎮 Debug Console inizializzata", "UI");
+    }
+
+    private void OnLogAdded()
+    {
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+            if (_autoScroll && _activeTab == "logs")
+            {
+                ScrollToBottom();
+            }
+        });
+    }
+
+    private void ToggleConsole()
+    {
+        _isVisible = !_isVisible;
+        if (_isVisible)
+        {
+            DebugService.AddLog(LogLevel.Debug, "👁️ Debug Console aperta", "UI");
+        }
+        StateHasChanged();
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        _activeTab = tab;
+        if (tab == "performance")
+        {
+            RefreshPerformance();
+        }
+    }
+
+    private void ClearLogs()
+    {
+        DebugService.ClearLogs();
+    }
+
+    private void ToggleAutoScroll()
+    {
+        _autoScroll = !_autoScroll;
+        DebugService.AddLog(LogLevel.Debug, $"📜 Auto scroll: {(_autoScroll ? "ON" : "OFF")}", "UI");
+    }
+
+    private void ScrollToBottom()
+    {
+        InvokeAsync(async () =>
+        {
+            await Task.Delay(50); // Piccolo delay per assicurarsi che il DOM sia aggiornato
+            await logsContainer.FocusAsync();
+        });
+    }
+
+    private void RefreshPerformance()
+    {
+        _performanceInfo = DebugService.GetPerformanceInfo();
+        StateHasChanged();
+    }
+
+    private void UpdatePerformance(object? state)
+    {
+        if (_activeTab == "performance")
+        {
+            InvokeAsync(() =>
+            {
+                _performanceInfo = DebugService.GetPerformanceInfo();
+                StateHasChanged();
+            });
+        }
+    }
+
+    private string GetLogLevelIcon(LogLevel level) => level switch
+    {
+        LogLevel.Error => "❌",
+        LogLevel.Critical => "💥",
+        LogLevel.Warning => "⚠️",
+        LogLevel.Information => "ℹ️",
+        LogLevel.Debug => "🔍",
+        _ => "📝"
+    };
+
+    private string FormatBytes(long bytes)
+    {
+        string[] suffixes = { "B", "KB", "MB", "GB" };
+        int counter = 0;
+        decimal number = bytes;
+        
+        while (Math.Round(number / 1024) >= 1)
+        {
+            number /= 1024;
+            counter++;
+        }
+        
+        return $"{number:n1} {suffixes[counter]}";
+    }
+
+    private string FormatTimeSpan(TimeSpan timeSpan)
+    {
+        if (timeSpan.TotalDays >= 1)
+            return $"{(int)timeSpan.TotalDays}d {timeSpan.Hours:D2}h {timeSpan.Minutes:D2}m";
+        else if (timeSpan.TotalHours >= 1)
+            return $"{timeSpan.Hours:D2}h {timeSpan.Minutes:D2}m {timeSpan.Seconds:D2}s";
+        else
+            return $"{timeSpan.Minutes:D2}m {timeSpan.Seconds:D2}s";
+    }
+
+    public void Dispose()
+    {
+        DebugService.OnLogAdded -= OnLogAdded;
+        _performanceTimer?.Dispose();
+    }
+}

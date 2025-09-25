@@ -217,6 +217,24 @@ Possibili miglioramenti e funzionalità da implementare:
 - [ ] 📋 **Budget planning** avanzato
 - [ ] 🎨 **Temi personalizzabili**
 
+## 🔧 Debug Features *(NEW!)*
+
+Il progetto include ora un **sistema di debug avanzato** per migliorare l'esperienza di sviluppo:
+
+### ✨ Funzionalità Debug Implementate
+- 🖥️ **Debug Console** retrattile con interface multi-tab
+- 📊 **Monitoraggio performance** in tempo reale
+- 🔍 **Sistema di logging** centralizzato con categorizzazione
+- 🧪 **Pagina test debug** per simulazioni e stress testing
+- ⚙️ **Configurazioni VS Code** ottimizzate per Blazor debugging
+
+### 🚀 Come Accedere
+1. **Debug Console**: Clicca il pulsante 🔧 in basso a destra (solo in Development)
+2. **Test Page**: Naviga su `/debug-test` dal menu (solo in Development)
+3. **VS Code Debug**: Usa le configurazioni in `.vscode/launch.json`
+
+📖 **Documentazione completa**: Vedi [`DEBUG_FEATURES.md`](./DEBUG_FEATURES.md) per dettagli tecnici
+
 ---
 
 <div align="center">

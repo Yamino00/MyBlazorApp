@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using MyBlazorApp.Components
 <div class="page">
     <header class="top-bar">
         <NavMenu />
@@ -10,3 +11,8 @@
         </div>
     </main>
 </div>
+
+@* Debug Console - visibile solo in ambiente di sviluppo *@
+#if DEBUG
+<DebugConsole />
+#endif

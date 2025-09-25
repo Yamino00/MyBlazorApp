@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject IDebugService DebugService
 
 <PageTitle>Dashboard - Gestione Budget</PageTitle>
 
@@ -112,6 +113,8 @@
 
     protected override void OnInitialized()
     {
+        DebugService.AddLog(Microsoft.Extensions.Logging.LogLevel.Information, "🏠 Dashboard caricata", "Pages");
+        
         // Dati di esempio
         recentTransactions = new List<Transaction>
         {
@@ -130,5 +133,8 @@
             { "Svago", 200.00m },
             { "Casa", 600.00m }
         };
+        
+        DebugService.AddLog(Microsoft.Extensions.Logging.LogLevel.Debug, $"💳 Caricate {recentTransactions.Count} transazioni", "Data");
+        DebugService.AddLog(Microsoft.Extensions.Logging.LogLevel.Debug, $"📊 Caricate {expensesByCategory.Count} categorie spese", "Data");
     }
 }
