@@ -4,7 +4,7 @@ name: Deploy Blazor App to GitHub Pages
 # In questo caso, si attiva ad ogni push sul branch 'main'.
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 # Concede i permessi necessari al workflow per scrivere su GitHub Pages.
 permissions:
