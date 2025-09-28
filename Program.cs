@@ -41,3 +41,4 @@ logger.LogDebug("⏱️ App startup time: {ElapsedMilliseconds}ms", stopwatch.El
 #endif
 
 await host.RunAsync();
+// Ciaoooooo
